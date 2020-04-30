@@ -1,8 +1,3 @@
 vendor
-.php_cs.cache
-composer.lock
-var
-!/Drift/draft/cache/.gitkeep
-Drift/draft/cache/
-/**/*.cache
-/build
+tests/build
+coverage
