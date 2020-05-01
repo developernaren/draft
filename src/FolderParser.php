@@ -8,7 +8,14 @@ use DraftPhp\Utils\Str;
 
 class FolderParser
 {
-    private $folders = [];
+    private $folders;
+    private $replaces = [
+        '/index.html',
+        '/index.md',
+        '.md',
+        '.html',
+
+    ];
 
     public function __construct(array $folders)
     {
@@ -22,24 +29,12 @@ class FolderParser
         });
         $this->folders = array_map(function ($folder) {
             $string = new Str($folder);
-
-            if ($string->endsWith('/index.html')) {
-                return $string->replaceLastWith('/index.html', '');
+            foreach ($this->replaces as $replace) {
+                if ($string->endsWith($replace)) {
+                    return $string->replaceLastWith($replace, '');
+                }
             }
-
-            if ($string->endsWith('/index.md')) {
-                return $string->replaceLastWith('/index.md', '');
-            }
-
-            if ($string->endsWith('.md')) {
-                return $string->replaceLastWith('.md', '');
-            }
-
-            if ($string->endsWith('.html')) {
-                return $string->replaceLastWith('.html', '');
-            }
-
-            return (string) $string;
+            return (string)$string;
 
         }, $this->folders);
 

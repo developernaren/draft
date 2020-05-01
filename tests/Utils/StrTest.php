@@ -46,7 +46,14 @@ class StrTest extends TestCase
 
         $string = new Str('blogs/replace.md');
         $this->assertSame($string->replaceLastWith('.md', ''), 'blogs/replace');
+    }
 
+    public function testReplaceAfterLast()
+    {
+        $string = new Str('narend/is/the/best/person.jpt');
+
+        $this->assertSame($string->replaceAfterLast('/'), 'narend/is/the/best');
+        $this->assertSame($string->replaceAfterLast('bg'), '');
     }
 
 

@@ -8,6 +8,7 @@ class Config
         'pages_dir' => '',
         'layout_dir' => '',
         'build_dir' => '',
+        'assets_dir' => '',
     ];
 
     public function __construct(array $options = [])
@@ -28,5 +29,10 @@ class Config
     public function getBuildBaseFolder()
     {
         return $this->options['build_dir'];
+    }
+
+    public function getAssetsBaseFolder()
+    {
+        return $this->options['assets_dir'];
     }
 }

@@ -4,6 +4,7 @@
 namespace DraftPhp;
 
 
+use DraftPhp\Utils\Str;
 use React\EventLoop\LoopInterface;
 use React\Filesystem\FilesystemInterface;
 use React\Filesystem\Node\File;
@@ -27,6 +28,51 @@ class SiteGenerator
         await($this->removeBuildFolder(), $this->loop);
         await($this->createFoldersForBuildFiles(), $this->loop);
         await($this->createStaticPages(), $this->loop);
+        $images = [];
+        await($this->lookForImages($images), $this->loop);
+
+        $imageDirectories = [];
+
+        foreach (array_unique($images) as $image) {
+            $imageDirectories[] = $this->config->getBuildBaseFolder() . (new Str($image))->replaceAfterLast('/');
+        }
+
+        $folderParsers = new FolderParser($imageDirectories);
+
+        foreach ($folderParsers->parse() as $folder) {
+            $createDir = $this->filesystem->dir($folder)->createRecursive();
+            await($createDir, $this->loop);
+        }
+
+        foreach ($images as $image) {
+            $sourceImage = $this->config->getAssetsBaseFolder() .  $image;
+            $targetImage = $this->config->getBuildBaseFolder() . $image;
+            $source = $this->filesystem->file($sourceImage);
+            $target = $this->filesystem->file($targetImage);
+            $copy = $source->copy($target);
+            await($copy, $this->loop);
+        }
+
+    }
+    public function lookForImages(&$images)
+    {
+        return $this->filesystem->dir($this->config->getBuildBaseFolder())
+            ->lsRecursive()
+            ->then(function ($nodes) use (&$images) {
+                foreach ($nodes as $node) {
+                    if ($node instanceof File) {
+                        $imageExtractor = $node->getContents()
+                            ->then(function ($content) use (&$images, &$processedFileCount) {
+                                $imageExtractor = new ImageExtractor($content);
+                                return $imageExtractor->getImages();
+                            });
+
+                        $extractedImages = await($imageExtractor, $this->loop);
+                        $images = array_merge($extractedImages, $images);
+                    }
+                }
+            });
+
     }
 
     private function createStaticPages()

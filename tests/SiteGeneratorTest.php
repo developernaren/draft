@@ -18,7 +18,7 @@ class SiteGeneratorTest extends AbstractTestCase
     public function tearDown(): void
     {
         parent::tearDown();
-        $this->deleteBuildFolder();
+//        $this->deleteBuildFolder();
     }
 
     public function testSiteGeneration()
@@ -29,5 +29,7 @@ class SiteGeneratorTest extends AbstractTestCase
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/index.html'));
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/blogs/index.html'));
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/blogs/2020/index.html'));
+        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/images/img3.jpg'));
+        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/img1.jpg'));
     }
 }

@@ -44,6 +44,14 @@ class Str
         return substr_replace($this, $replace, $position, $length);
     }
 
+    public function replaceAfterLast(string $after)
+    {
+        $strArr = explode($after, $this);
+        unset($strArr[count($strArr) - 1]);
+
+        return implode($after, $strArr);
+    }
+
     public function __toString()
     {
         return $this->string;
