@@ -21,7 +21,8 @@ class AbstractContentFile
 
     public function getMetaData(): PromiseInterface
     {
-        return $this->getContent()->then(function ($content) {
+        return $this->getContent()
+            ->then(function ($content) {
             return new MetaParser($this->getMeta($content), $this->getBody($content));
         });
     }

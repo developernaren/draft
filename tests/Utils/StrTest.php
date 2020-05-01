@@ -39,5 +39,15 @@ class StrTest extends TestCase
         $this->assertSame($string->replaceAllWith('n', ''), 'aredra chitrakar');
     }
 
+    public function testReplaceLastWith()
+    {
+        $string = new Str('narern.httmlnaren.html');
+        $this->assertSame($string->replaceLastWith('.html', ''), 'narern.httmlnaren');
+
+        $string = new Str('blogs/replace.md');
+        $this->assertSame($string->replaceLastWith('.md', ''), 'blogs/replace');
+
+    }
+
 
 }

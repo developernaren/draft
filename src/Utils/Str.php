@@ -36,6 +36,14 @@ class Str
         return str_replace($search, $replace, $this);
     }
 
+    public function replaceLastWith(string $search, string $replace)
+    {
+        $length = strlen($search);
+        $position = (int)('-' . $length);
+
+        return substr_replace($this, $replace, $position, $length);
+    }
+
     public function __toString()
     {
         return $this->string;
