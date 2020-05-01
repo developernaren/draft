@@ -69,7 +69,9 @@ Refer to this file for [example](/Drift/draft/pages/blogs/index.html)
         
 I feel like there is only so much a static site generator should be able to do, but feel free to add things you would like to see here.
         
- 
+## Badge
+
+[![CircleCI](https://circleci.com/gh/draftphp/draft.svg?style=svg)](https://circleci.com/gh/draftphp/draft)
 
 
 
