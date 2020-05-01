@@ -5,12 +5,7 @@ namespace Tests\Builders;
 
 
 use DraftPhp\Config;
-use DraftPhp\Contents\Html;
-use DraftPhp\Contents\MetaParser;
-use DraftPhp\FileReader;
 use DraftPhp\HtmlGenerator;
-use DraftPhp\PageBuilder;
-use React\Promise\Deferred;
 use Symfony\Component\DomCrawler\Crawler;
 use Tests\AbstractTestCase;
 use function Clue\React\Block\await;

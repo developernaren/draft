@@ -1,12 +1,12 @@
 {
     "name": "draftphp/draft",
-    "description": "Skeleton repository ofr DriftPHP",
+    "description": "Site generator written in PHP",
     "type": "project",
     "license": "MIT",
     "authors": [
         {
-            "name": "Marc Morera",
-            "email": "yuhu@mmoreram.com"
+            "name": "Narendra Chitrakar",
+            "email": "developer.naren@gmail.com"
         }
     ],
     "require": {
