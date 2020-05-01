@@ -2,12 +2,12 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/7.4.4-cli
+      - image: circleci/php:7.4.4-cli
     steps:
       - checkout
 
       - run: sudo apt update
-        
+
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "composer.lock" }}
