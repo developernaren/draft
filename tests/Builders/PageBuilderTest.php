@@ -25,7 +25,7 @@ class PageBuilderTest extends AbstractTestCase
 
         $config = new Config($configData);
 
-        $builder = new HtmlGenerator($config, $this->filesystem, 'index.html');
+        $builder = new HtmlGenerator($config, $this->filesystem, $config->getPageBaseFolder() . '/index.html');
         $result = $builder->getHtml()->then(function ($outputContent){
             $domCrawler = new Crawler($outputContent);
             //title is correct in the generate html
@@ -45,11 +45,11 @@ class PageBuilderTest extends AbstractTestCase
 
         $config = new Config($configData);
 
-        $builder = new HtmlGenerator($config, $this->filesystem, 'non-html.md');
+        $builder = new HtmlGenerator($config, $this->filesystem, $config->getPageBaseFolder() . '/non-html.md');
         $result = $builder->getHtml()->then(function ($outputContent){
 
             $domCrawler = new Crawler($outputContent);
-//            title is correct in the generate html
+//          title is correct in the generate html
             $this->assertSame('Blog Title', $domCrawler->filterXPath('//title')->getNode(0)->textContent);
             $this->assertSame('This is the h1 tag', $domCrawler->filterXPath('//h1')->getNode(0)->textContent);
             $this->assertSame('this may be a blog post', $domCrawler->filterXPath('//h2')->getNode(0)->textContent);

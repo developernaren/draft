@@ -11,7 +11,7 @@ use React\Filesystem\FilesystemInterface;
 class Factory
 {
 
-    public static function create(FilesystemInterface $filesystem, $filename)
+    public static function create(FilesystemInterface $filesystem, string $filename)
     {
         $string = new Str($filename);
 

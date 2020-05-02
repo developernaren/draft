@@ -8,7 +8,6 @@ use React\Promise\PromiseInterface;
 
 class Md extends AbstractContentFile implements HasMetaData
 {
-    protected $fileReader;
 
     public function getMetaData(): PromiseInterface
     {
