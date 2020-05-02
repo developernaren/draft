@@ -34,7 +34,7 @@ $configData = [
 
 $config = new Config($configData);
 //this would build the html page based on `/path/to/pages/index.html`
-$generator = new HtmlGenerator($config, $filesystem, 'index.html');
+$generator = new HtmlGenerator($config, $filesystem, '/path/to/pages/index.html');
 
 //usage as promise
 $generator->getHtml()
