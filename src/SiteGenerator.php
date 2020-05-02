@@ -113,8 +113,6 @@ class SiteGenerator
                     }
                 }
             });
-
-
     }
 
     private function removeBuildFolder()

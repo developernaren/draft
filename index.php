@@ -51,6 +51,19 @@ $loop->addPeriodicTimer(1, function() use ($watcher, $filesystem, $loop, $config
     }
 });
 
+
+$httpServer = new \React\Http\Server(function (\Psr\Http\Message\ServerRequestInterface $request) {
+    return new \React\Http\Response(
+        200,
+        array(
+            'Content-Type' => 'text/plain'
+        ),
+        "Hello World!\n"
+    );
+});
+
+exec('open file://' . $config->getBuildBaseFolder() .'/index.html');
+
 $server->run();
 
 
