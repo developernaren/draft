@@ -16,13 +16,15 @@ class FolderParser
         '.html',
 
     ];
+    private $sortedArr = [];
 
     public function __construct(array $folders)
     {
         $this->folders = $folders;
+        $this->parseFolders();
     }
 
-    public function parse(): array
+    private function parseFolders()
     {
         usort($this->folders, function (string $a, string $b) {
             return substr_count($a, '/') < substr_count($b, '/');
@@ -54,6 +56,10 @@ class FolderParser
             }
         }
 
-        return array_unique($sortedArr);
+        $this->sortedArr = $sortedArr;
+    }
+    public function parse(): array
+    {
+        return array_unique($this->sortedArr);
     }
 }

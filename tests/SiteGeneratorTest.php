@@ -18,7 +18,7 @@ class SiteGeneratorTest extends AbstractTestCase
     public function tearDown(): void
     {
         parent::tearDown();
-//        $this->deleteBuildFolder();
+        $this->deleteBuildFolder();
     }
 
     public function testSiteGeneration()
