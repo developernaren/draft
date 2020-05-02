@@ -28,6 +28,11 @@ class SiteGenerator
         await($this->removeBuildFolder(), $this->loop);
         await($this->createFoldersForBuildFiles(), $this->loop);
         await($this->createStaticPages(), $this->loop);
+
+        if(empty($this->config->getAssetsBaseFolder())) {
+            return;
+        }
+
         $images = [];
         await($this->lookForImages($images), $this->loop);
 

@@ -8,7 +8,6 @@ use function Clue\React\Block\await;
 
 class SiteGeneratorTest extends AbstractTestCase
 {
-
     public function setUp(): void
     {
         parent::setUp();
@@ -31,5 +30,22 @@ class SiteGeneratorTest extends AbstractTestCase
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/blogs/2020/index.html'));
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/images/img3.jpg'));
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/img1.jpg'));
+    }
+
+    public function testImageGenerationIsStoppedIfTheAssetsFolderIsNotDefined()
+    {
+        $config = new Config([
+            'pages_dir' => getBaseDir() . '/Mocks/pages',
+            'layout_dir' => getBaseDir() . '/Mocks/layouts',
+            'build_dir' => getBaseDir() . '/Mocks/build'
+        ]);
+
+        $siteGenerator = new SiteGenerator($config, $this->filesystem, $this->loop);
+        $siteGenerator->build();
+        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/non-html/index.html'));
+        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/index.html'));
+        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/blogs/index.html'));
+        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/blogs/2020/index.html'));
+        $this->assertTrue(!file_exists($this->baseDir . '/Mocks/build/img1.jpg'));
     }
 }
