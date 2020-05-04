@@ -1,5 +1,5 @@
 {
-    "name": "draftphp/draft",
+    "name": "draftphp/core",
     "description": "Site generator written in PHP",
     "type": "project",
     "license": "MIT",
