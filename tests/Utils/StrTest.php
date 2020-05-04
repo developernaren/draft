@@ -56,5 +56,12 @@ class StrTest extends TestCase
         $this->assertSame($string->replaceAfterLast('bg'), '');
     }
 
+    public function testRemoveAfterLast()
+    {
+        $string = new Str('naren.html');
+        $this->assertSame('html', $string->getAfterLast('.'));
+        $this->assertSame('', $string->getAfterLast('dhirendra'));
+    }
+
 
 }

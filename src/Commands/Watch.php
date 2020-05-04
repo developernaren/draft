@@ -5,10 +5,12 @@ namespace DraftPhp\Commands;
 use DraftPhp\BuildFileResolver;
 use DraftPhp\HtmlGenerator;
 use DraftPhp\SiteGenerator;
+use DraftPhp\Utils\Str;
 use DraftPhp\Watcher\FileChange;
 use Psr\Http\Message\ServerRequestInterface;
 use React\EventLoop\Factory;
 use React\Filesystem\Filesystem;
+use React\Filesystem\FilesystemInterface;
 use React\Http\Response;
 use React\Http\Server;
 use Symfony\Component\Console\Command\Command;
@@ -22,6 +24,7 @@ use Yosymfony\ResourceWatcher\ResourceWatcher;
 use Yosymfony\ResourceWatcher\ResourceCachePhpFile;
 use function Clue\React\Block\await;
 use function Clue\React\Block\awaitAll;
+use DraftPhp\Responses\Factory as ResponseFactory;
 
 class Watch extends Command
 {
@@ -38,7 +41,7 @@ class Watch extends Command
     ];
     private $watcher;
     private $changedFiles = [];
-    private $pathContentMap = [];
+    public static $contentHashMap = [];
 
     public function __construct(Config $config)
     {
@@ -82,6 +85,9 @@ class Watch extends Command
                 $this->message->notifyFileChange($file);
                 $generator->getHtml()->then(function ($content) use ($file) {
                     $buildFile = (new BuildFileResolver($this->config, $file))->getName();
+                    $path = str_replace($this->config->getBuildBaseFolder(), '', (new Str($buildFile))->removeLast('/index.html'));
+
+                    unset(self::$contentHashMap[$path]);
                     $this->message->notifyFileChange($file);
                     file_put_contents($buildFile, $content);
                     $this->io->text(sprintf('%s build', $buildFile));
@@ -92,32 +98,10 @@ class Watch extends Command
         $server = new Server(function (ServerRequestInterface $request) use (&$firstBuild) {
 
             $path = $request->getUri()->getPath();
-            $filename = $this->config->getBuildBaseFolder() . '/' . $path . '/index.html';
-            $filename = str_replace('///', '/', $filename);
-            $filename = str_replace('//', '/', $filename);
+            $fullPath = $request->getUri()->__toString();
 
-            $file = $this->filesystem->file($filename);
-            $script = $this->getWatchJs($request->getUri()->__toString());
-
-            return
-                $file->exists()
-                    ->then(function () use ($file, $filename, $script, $path) {
-                        return $file->getContents()
-                            ->then(function ($content) use ($filename, $script, $path) {
-                                $content .= $script;
-                                $hash = $this->getContentHash($content);
-
-                                if (isset($this->pathContentMap[$path]) && $this->pathContentMap[$path] === $hash) {
-                                    return new Response(204, $this->headers);
-                                }
-
-                                $this->pathContentMap[$path] = $hash;
-                                return new Response(200, $this->headers, $content);
-
-                            });
-                    }, function () {
-                        return new Response(404, $this->headers, 'Not Found!');
-                    });
+            return ResponseFactory::create($this->config, $this->filesystem, $path, $fullPath)
+                ->toResponse();
         });
 
         exec('open http://localhost:8888');

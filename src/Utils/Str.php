@@ -44,12 +44,37 @@ class Str
         return substr_replace($this, $replace, $position, $length);
     }
 
+    public function removeLast(string $string): string
+    {
+        return $this->replaceLastWith($string, '');
+    }
+
     public function replaceAfterLast(string $after)
     {
         $strArr = explode($after, $this);
         unset($strArr[count($strArr) - 1]);
 
         return implode($after, $strArr);
+    }
+
+    public function getAfterLast(string $string)
+    {
+        $parts = explode($string, $this);
+
+        return count($parts) === 1 ? '' : end($parts);
+    }
+
+    /**
+     * @param string [] $strings
+     */
+    public function endsWithAny(array $strings)
+    {
+        foreach ($strings as $string) {
+            if ($this->endsWith($string)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function __toString()
