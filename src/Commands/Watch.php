@@ -4,6 +4,7 @@ namespace DraftPhp\Commands;
 
 use DraftPhp\BuildFileResolver;
 use DraftPhp\HtmlGenerator;
+use DraftPhp\SiteGenerator;
 use DraftPhp\Watcher\FileChange;
 use Psr\Http\Message\ServerRequestInterface;
 use React\EventLoop\Factory;
@@ -51,7 +52,7 @@ class Watch extends Command
         $this->io = $io = new SymfonyStyle($input, $output);
         $this->message = new FileChange($io, $this->config);;
         $this->loop = Factory::create();
-        $filesystem = Filesystem::create($this->loop);
+        $this->filesystem = Filesystem::create($this->loop);
 
         $finder = new Finder();
         $finder->files()
@@ -64,11 +65,14 @@ class Watch extends Command
         $this->watcher = new ResourceWatcher($resourceCache, $finder, $hashContent);
         $this->watcher->initialize();
 
-        $this->loop->addPeriodicTimer(1, function () use ($filesystem) {
+        $siteGenerator = new SiteGenerator($this->config, $this->filesystem, $this->loop);
+        $siteGenerator->build();
+
+        $this->loop->addPeriodicTimer(1, function () {
             $result = $this->watcher->findChanges();
             $this->changedFiles = $changedFiles = $result->getUpdatedFiles();
             foreach ($changedFiles as $file) {
-                $generator = new HtmlGenerator($this->config, $filesystem, $file);
+                $generator = new HtmlGenerator($this->config, $this->filesystem, $file);
                 $this->message->notifyFileChange($file);
                 $generator->getHtml()->then(function ($content) use ($file) {
                     $buildFile = (new BuildFileResolver($this->config, $file))->getName();
@@ -79,14 +83,14 @@ class Watch extends Command
             }
         });
 
-        $server = new Server(function (ServerRequestInterface $request) use ($filesystem, $io, &$firstBuild) {
+        $server = new Server(function (ServerRequestInterface $request) use (&$firstBuild) {
 
             $path = $request->getUri()->getPath();
             $filename = $this->config->getBuildBaseFolder() . '/' . $path . '/index.html';
             $filename = str_replace('///', '/', $filename);
             $filename = str_replace('//', '/', $filename);
 
-            $file = $filesystem->file($filename);
+            $file = $this->filesystem->file($filename);
             $script = $this->getWatchJs($request->getUri()->__toString());
 
             return
