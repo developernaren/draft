@@ -24,14 +24,13 @@ class SiteGeneratorTest extends AbstractTestCase
     {
         $siteGenerator = new SiteGenerator($this->config, $this->filesystem, $this->loop);
         $siteGenerator->build();
-        $this->assertTrue(true);
 
-//        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/non-html/index.html'));
-//        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/index.html'));
-//        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/blogs/index.html'));
-//        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/blogs/2020/index.html'));
-//        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/images/img3.jpg'));
-//        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/img1.jpg'));
+        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/non-html/index.html'));
+        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/index.html'));
+        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/blogs/index.html'));
+        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/blogs/2020/index.html'));
+        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/images/img3.jpg'));
+        $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/img1.jpg'));
     }
 
     public function testImageGenerationIsStoppedIfTheAssetsFolderIsNotDefined()

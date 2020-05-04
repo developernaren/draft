@@ -5,6 +5,6 @@
 
 # This is the h1 tag
 
-## this may be a blog post
+## this may be a blog news
 
 This is the content of the page
