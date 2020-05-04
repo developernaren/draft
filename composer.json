@@ -1,7 +1,7 @@
 {
     "name": "draftphp/core",
     "description": "Site generator written in PHP",
-    "type": "project",
+    "type": "library",
     "license": "MIT",
     "authors": [
         {
