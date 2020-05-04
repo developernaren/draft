@@ -11,19 +11,20 @@ class SiteGeneratorTest extends AbstractTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->deleteBuildFolder();
+//        $this->deleteBuildFolder();
     }
 
     public function tearDown(): void
     {
         parent::tearDown();
-        $this->deleteBuildFolder();
+//        $this->deleteBuildFolder();
     }
 
     public function testSiteGeneration()
     {
         $siteGenerator = new SiteGenerator($this->config, $this->filesystem, $this->loop);
         $siteGenerator->build();
+
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/non-html/index.html'));
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/index.html'));
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/blogs/index.html'));

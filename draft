@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+
+use DraftPhp\Config;
+
+require_once 'vendor/autoload.php';
+
+$configData = include getBaseDir() . '/config.php';
+$devConfig  = array_merge($configData, ['is_dev' => true]);
+
+$app = new \Symfony\Component\Console\Application();
+
+$app->add(new \DraftPhp\Commands\Watch(new Config($devConfig)));
+$app->add(new \DraftPhp\Commands\Build(new Config($configData)));
+
+$app->run();

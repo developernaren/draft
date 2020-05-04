@@ -9,6 +9,7 @@ class Config
         'layout_dir' => '',
         'build_dir' => '',
         'assets_dir' => '',
+        'is_dev' => false,
     ];
 
     public function __construct(array $options = [])
@@ -34,5 +35,10 @@ class Config
     public function getAssetsBaseFolder()
     {
         return $this->options['assets_dir'];
+    }
+
+    public function isDevelopmentMode()
+    {
+        return $this->options['is_dev'];
     }
 }
