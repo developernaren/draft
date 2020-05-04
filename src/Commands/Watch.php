@@ -33,7 +33,11 @@ class Watch extends Command
     private $headers = [
         'Access-Control-Allow-Origin' => '*',
         'Access-Control-Allow-Methods' => '*',
+        'Content-Type' => 'text/html',
     ];
+    private $watcher;
+    private $changedFiles = [];
+    private $pathContentMap = [];
 
     public function __construct(Config $config)
     {
@@ -57,52 +61,56 @@ class Watch extends Command
 
         $hashContent = new Crc32ContentHash();
         $resourceCache = new ResourceCachePhpFile(getBaseDir() . '/path-cache-file.php');
-        $watcher = new ResourceWatcher($resourceCache, $finder, $hashContent);
-        $watcher->initialize();
+        $this->watcher = new ResourceWatcher($resourceCache, $finder, $hashContent);
+        $this->watcher->initialize();
 
-        $this->loop->addPeriodicTimer(1, function () use ($watcher, $filesystem) {
-            $result = $watcher->findChanges();
-            $changedFiles = $result->getUpdatedFiles();
+        $this->loop->addPeriodicTimer(1, function () use ($filesystem) {
+            $result = $this->watcher->findChanges();
+            $this->changedFiles = $changedFiles = $result->getUpdatedFiles();
             foreach ($changedFiles as $file) {
                 $generator = new HtmlGenerator($this->config, $filesystem, $file);
                 $this->message->notifyFileChange($file);
                 $generator->getHtml()->then(function ($content) use ($file) {
-//                    $this->message->notifyFileBuilt($file, $content);
-//                    $content .= '<script>' . file_get_contents(getBaseDir() . '/watch.js') . '</script>';
-//                    $content .= '<input type="hidden" name="draft_filename" value="' . $file . '"/>';
                     $buildFile = (new BuildFileResolver($this->config, $file))->getName();
-
-                    $this->io->text($content);
-                    $this->io->text($buildFile);
-                    $content .= '<script>' . file_get_contents(getBaseDir() . '/watch.js') . '</script>';
+                    $this->message->notifyFileChange($file);
                     file_put_contents($buildFile, $content);
-                    $this->io->text(sprintf('%s written', $buildFile));
-//                    $file = $this->filesystem->file($buildFile);
-//                    $writeFile = $file->putContents($content);
-//                    await($writeFile, $this->loop);
+                    $this->io->text(sprintf('%s build', $buildFile));
                 });
             }
         });
 
-        $server = new Server(function (ServerRequestInterface $request) use ($filesystem, $io) {
+        $server = new Server(function (ServerRequestInterface $request) use ($filesystem, $io, &$firstBuild) {
 
-            $filename = $this->config->getBuildBaseFolder() . '/' . $request->getUri()->getPath() . '/index.html';
-
-            $io->block(sprintf('requesting %s', $filename));
+            $path = $request->getUri()->getPath();
+            $filename = $this->config->getBuildBaseFolder() . '/' . $path . '/index.html';
+            $filename = str_replace('///', '/', $filename);
+            $filename = str_replace('//', '/', $filename);
 
             $file = $filesystem->file($filename);
+            $script = $this->getWatchJs($request->getUri()->__toString());
 
             return
                 $file->exists()
-                    ->then(function () use ($file) {
+                    ->then(function () use ($file, $filename, $script, $path) {
                         return $file->getContents()
-                            ->then(function ($content) {
+                            ->then(function ($content) use ($filename, $script, $path) {
+                                $content .= $script;
+                                $hash = $this->getContentHash($content);
+
+                                if (isset($this->pathContentMap[$path]) && $this->pathContentMap[$path] === $hash) {
+                                    return new Response(204, $this->headers);
+                                }
+
+                                $this->pathContentMap[$path] = $hash;
                                 return new Response(200, $this->headers, $content);
+
                             });
                     }, function () {
-                        return new Response(404, array_merge($this->headers, ['Content-Type' => 'text/html']), 'Not Found!');
+                        return new Response(404, $this->headers, 'Not Found!');
                     });
         });
+
+        exec('open http://localhost:8888');
 
         $socket = new \React\Socket\Server('127.0.0.1:8888', $this->loop);
         $server->listen($socket);
@@ -110,5 +118,38 @@ class Watch extends Command
         $this->loop->run();
 
         return 0;
+    }
+
+    private function getWatchJs($path): string
+    {
+        $js = <<<HTML
+<script>
+function watch() {
+    fetch('${path}',{
+        mode: 'cors',
+        headers :{
+            'Content-Type' : 'text/plain',
+        },
+        cache : 'no-cache',
+    })
+        .then(function (response) {
+            return response.text();
+        }).then(function (html) {
+            if(html){
+                const page = document.getElementsByTagName('html')[0]
+                page.innerHTML = html;
+            }
+
+    })
+}
+setInterval(watch, 1000);
+</script>
+HTML;
+        return $js;
+    }
+
+    private function getContentHash($content): string
+    {
+        return hash('crc32', $content);
     }
 }
