@@ -48,17 +48,20 @@ class Watch extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-
         $this->io = $io = new SymfonyStyle($input, $output);
         $this->message = new FileChange($io, $this->config);;
         $this->loop = Factory::create();
         $this->filesystem = Filesystem::create($this->loop);
 
+        $folderWatching = [$this->config->getPageBaseFolder()];
+        $this->io->title('Watching for file changes');
+        $this->io->table(['watching folder'] , [[implode(' and ' , $folderWatching)]]);
+
         $finder = new Finder();
         $finder->files()
             ->name('*.html')
             ->name('*.md')
-            ->in([getBaseDir() . '/Mocks/pages']);
+            ->in($folderWatching);
 
         $hashContent = new Crc32ContentHash();
         $resourceCache = new ResourceCachePhpFile(getBaseDir() . '/path-cache-file.php');
@@ -67,6 +70,9 @@ class Watch extends Command
 
         $siteGenerator = new SiteGenerator($this->config, $this->filesystem, $this->loop);
         $siteGenerator->build();
+
+        $content = $this->getWatchJs('http://localhost:8888')  . file_get_contents($this->config->getBuildBaseFolder() . '/index.html');
+        file_put_contents($this->config->getBuildBaseFolder() . '/index.html', $content);
 
         $this->loop->addPeriodicTimer(1, function () {
             $result = $this->watcher->findChanges();
