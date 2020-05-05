@@ -34,11 +34,6 @@ class Watch extends Command
     private $filesystem;
     private $io;
     private $loop;
-    private $headers = [
-        'Access-Control-Allow-Origin' => '*',
-        'Access-Control-Allow-Methods' => '*',
-        'Content-Type' => 'text/html',
-    ];
     private $watcher;
     private $changedFiles = [];
     public static $contentHashMap = [];
@@ -51,6 +46,7 @@ class Watch extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $port = $this->config->getPort();
         $this->io = $io = new SymfonyStyle($input, $output);
         $this->message = new FileChange($io, $this->config);;
         $this->loop = Factory::create();
@@ -74,7 +70,7 @@ class Watch extends Command
         $siteGenerator = new SiteGenerator($this->config, $this->filesystem, $this->loop);
         $siteGenerator->build();
 
-        $content = $this->getWatchJs('http://localhost:8888')  . file_get_contents($this->config->getBuildBaseFolder() . '/index.html');
+        $content = $this->getWatchJs('http://localhost:' .$port)  . file_get_contents($this->config->getBuildBaseFolder() . '/index.html');
         file_put_contents($this->config->getBuildBaseFolder() . '/index.html', $content);
 
         $this->loop->addPeriodicTimer(1, function () {
@@ -104,9 +100,9 @@ class Watch extends Command
                 ->toResponse();
         });
 
-        exec('open http://localhost:8888');
+        exec('open http://localhost:' . $port);
 
-        $socket = new \React\Socket\Server('127.0.0.1:8888', $this->loop);
+        $socket = new \React\Socket\Server('127.0.0.1:' . $port, $this->loop);
         $server->listen($socket);
 
         $this->loop->run();
