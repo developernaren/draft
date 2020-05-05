@@ -29,12 +29,15 @@ class SiteGenerator
         await($this->createFoldersForBuildFiles(), $this->loop);
         await($this->createStaticPages(), $this->loop);
 
-        if(empty($this->config->getAssetsBaseFolder())) {
+        if (empty($this->config->getAssetsBaseFolder())) {
             return;
         }
 
         $images = [];
         await($this->lookForImages($images), $this->loop);
+        if (empty($images)) {
+            return;
+        }
 
         $imageDirectories = [];
 
@@ -45,12 +48,17 @@ class SiteGenerator
         $folderParsers = new FolderParser($imageDirectories);
 
         foreach ($folderParsers->parse() as $folder) {
+
+            if ($this->config->getBuildBaseFolder() === $folder) {
+                continue;
+            }
+
             $createDir = $this->filesystem->dir($folder)->createRecursive();
             await($createDir, $this->loop);
         }
 
         foreach ($images as $image) {
-            $sourceImage = $this->config->getAssetsBaseFolder() .  $image;
+            $sourceImage = $this->config->getAssetsBaseFolder() . $image;
             $targetImage = $this->config->getBuildBaseFolder() . $image;
             $source = $this->filesystem->file($sourceImage);
             $target = $this->filesystem->file($targetImage);
@@ -59,6 +67,7 @@ class SiteGenerator
         }
 
     }
+
     public function lookForImages(&$images)
     {
         return $this->filesystem->dir($this->config->getBuildBaseFolder())
