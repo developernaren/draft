@@ -10,6 +10,7 @@ class Config
         'build_dir' => '',
         'assets_dir' => '',
         'is_dev' => false,
+        'port' => '8888',
     ];
 
     public function __construct(array $options = [])
@@ -40,5 +41,10 @@ class Config
     public function isDevelopmentMode()
     {
         return $this->options['is_dev'];
+    }
+
+    public function getPort()
+    {
+        return $this->options['port'];
     }
 }
