@@ -22,7 +22,7 @@ class SiteGeneratorTest extends AbstractTestCase
 
     public function testSiteGeneration()
     {
-        $siteGenerator = new SiteGenerator($this->config, $this->filesystem, $this->loop);
+        $siteGenerator = new SiteGenerator($this->config, $this->filesystem, $this->loop, $this->getMockIo());
         $siteGenerator->build();
 
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/non-html/index.html'));
@@ -42,12 +42,38 @@ class SiteGeneratorTest extends AbstractTestCase
             'build_dir' => getBaseDir() . '/Mocks/build'
         ]);
 
-        $siteGenerator = new SiteGenerator($config, $this->filesystem, $this->loop);
+        $siteGenerator = new SiteGenerator($config, $this->filesystem, $this->loop, $this->getMockIo());
         $siteGenerator->build();
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/non-html/index.html'));
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/index.html'));
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/blogs/index.html'));
         $this->assertTrue(file_exists($this->baseDir . '/Mocks/build/blogs/2020/index.html'));
         $this->assertTrue(!file_exists($this->baseDir . '/Mocks/build/img1.jpg'));
+    }
+
+    public function getMockIo()
+    {
+        return new class {
+
+            public function text(...$arg){
+
+            }
+
+            public function title(...$arg){
+
+            }
+
+            public function section(...$arg){
+
+            }
+
+            public function success(...$arg){
+
+            }
+
+            public function listing(...$arg){
+
+            }
+        };
     }
 }

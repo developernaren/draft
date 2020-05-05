@@ -30,13 +30,8 @@ class Build extends Command
         $loop = Factory::create();
         $filesystem = Filesystem::create($loop);
         $io = new SymfonyStyle($input, $output);
-
-        $io->writeln('Building Site');
-
-        $siteGenerator = new SiteGenerator($this->config, $filesystem, $loop);
+        $siteGenerator = new SiteGenerator($this->config, $filesystem, $loop, $io);
         $siteGenerator->build();
-
-        $io->writeln('Site Built');
 
         return 0;
     }
