@@ -100,7 +100,7 @@ class Watch extends Command
                 ->toResponse();
         });
 
-        exec('open http://localhost:' . $port);
+        $this->openBrowser($port);
 
         $socket = new \React\Socket\Server('127.0.0.1:' . $port, $this->loop);
         $server->listen($socket);
@@ -141,5 +141,20 @@ HTML;
     private function getContentHash($content): string
     {
         return hash('crc32', $content);
+    }
+
+    public function openBrowser($port)
+    {
+        switch (PHP_OS_FAMILY) {
+            case 'Linux':
+                exec('xdg-open http://localhost:' . $port);
+                break;
+            case 'Windows':
+                exec('start http://localhost:' . $port);
+                break;
+            default:
+                exec('open http://localhost:' . $port);
+        }
+
     }
 }
