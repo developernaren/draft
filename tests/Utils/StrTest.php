@@ -48,15 +48,15 @@ class StrTest extends TestCase
         $this->assertSame($string->replaceLastWith('.md', ''), 'blogs/replace');
     }
 
-    public function testReplaceAfterLast()
+    public function testRemoveAfterLast()
     {
         $string = new Str('narend/is/the/best/person.jpt');
 
-        $this->assertSame($string->replaceAfterLast('/'), 'narend/is/the/best');
-        $this->assertSame($string->replaceAfterLast('bg'), '');
+        $this->assertSame($string->removeAllAfterLast('/'), 'narend/is/the/best');
+        $this->assertSame($string->removeAllAfterLast('bg'), '');
     }
 
-    public function testRemoveAfterLast()
+    public function testGetAfterLast()
     {
         $string = new Str('naren.html');
         $this->assertSame('html', $string->getAfterLast('.'));

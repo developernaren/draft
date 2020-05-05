@@ -30,8 +30,7 @@ class Html extends AbstractResponse
         ]);
 
         $filename = $this->config->getBuildBaseFolder() . '/' . $path . '/index.html';
-        $filename = str_replace('///', '/', $filename);
-        $this->filename = str_replace('//', '/', $filename);
+        $this->filename = $this->removeMultipleSlashes($filename);
         $this->fullPath = $fullPath;
         $this->filesystem = $filesystem;
     }

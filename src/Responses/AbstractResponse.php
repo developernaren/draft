@@ -37,4 +37,21 @@ abstract class AbstractResponse
         };
     }
 
+    protected function removeMultipleSlashes(string $string)
+    {
+        $string = str_replace('///', '/', $string);
+        return str_replace('//', '/', $string);
+    }
+
+    protected final function getMimeTypeHeader(string $imageType): array
+    {
+        $imageMimeTypes = [
+            'png' => ['Content-Type' => 'image/png'],
+            'jpeg' => ['Content-Type' => 'image/jpeg'],
+            'jpg' => ['Content-Type' => 'image/jpg'],
+            'css' => ['Content-Type' => 'text/css'],
+        ];
+
+        return $imageMimeTypes[$imageType];
+    }
 }

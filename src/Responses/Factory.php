@@ -20,8 +20,8 @@ class Factory
 
     public static function create(Config $config, FilesystemInterface $filesystem, string $path, string $fullPath)
     {
-        if (self::isImage($path) ){
-            return new Image($config, $filesystem, $path, $fullPath);
+        if (self::isImage($path) || self::isCss($path)) {
+            return new Asset($config, $filesystem, $path, $fullPath);
         }
 
         return new Html($config, $filesystem, $path, $fullPath);
@@ -29,6 +29,11 @@ class Factory
 
     private static function isImage($path)
     {
-        return (new Str($path))->endsWithAny(self::$imageFileExtensions);
+        return (new Str(strtolower($path)))->endsWithAny(self::$imageFileExtensions);
+    }
+
+    public static function isCss($path)
+    {
+        return (new Str($path))->endsWith('css');
     }
 }

@@ -49,7 +49,7 @@ class Str
         return $this->replaceLastWith($string, '');
     }
 
-    public function replaceAfterLast(string $after)
+    public function removeAllAfterLast(string $after)
     {
         $strArr = explode($after, $this);
         unset($strArr[count($strArr) - 1]);
@@ -58,6 +58,13 @@ class Str
     }
 
     public function getAfterLast(string $string)
+    {
+        $parts = explode($string, $this);
+
+        return count($parts) === 1 ? '' : end($parts);
+    }
+
+    public function getBeforeLast(string $string)
     {
         $parts = explode($string, $this);
 

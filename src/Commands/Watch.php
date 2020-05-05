@@ -10,8 +10,6 @@ use DraftPhp\Watcher\FileChange;
 use Psr\Http\Message\ServerRequestInterface;
 use React\EventLoop\Factory;
 use React\Filesystem\Filesystem;
-use React\Filesystem\FilesystemInterface;
-use React\Http\Response;
 use React\Http\Server;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,8 +20,6 @@ use Symfony\Component\Finder\Finder;
 use Yosymfony\ResourceWatcher\Crc32ContentHash;
 use Yosymfony\ResourceWatcher\ResourceWatcher;
 use Yosymfony\ResourceWatcher\ResourceCachePhpFile;
-use function Clue\React\Block\await;
-use function Clue\React\Block\awaitAll;
 use DraftPhp\Responses\Factory as ResponseFactory;
 
 class Watch extends Command
@@ -96,8 +92,8 @@ class Watch extends Command
             $path = $request->getUri()->getPath();
             $fullPath = $request->getUri()->__toString();
 
-            return ResponseFactory::create($this->config, $this->filesystem, $path, $fullPath)
-                ->toResponse();
+            $response = ResponseFactory::create($this->config, $this->filesystem, $path, $fullPath);
+            return $response->toResponse();
         });
 
         $this->openBrowser($port);

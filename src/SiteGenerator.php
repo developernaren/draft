@@ -4,6 +4,7 @@
 namespace DraftPhp;
 
 
+use DraftPhp\Extractors\AssetExtractor;
 use DraftPhp\Utils\Str;
 use React\EventLoop\LoopInterface;
 use React\Filesystem\FilesystemInterface;
@@ -42,7 +43,7 @@ class SiteGenerator
         $imageDirectories = [];
 
         foreach (array_unique($images) as $image) {
-            $imageDirectories[] = $this->config->getBuildBaseFolder() . (new Str($image))->replaceAfterLast('/');
+            $imageDirectories[] = $this->config->getBuildBaseFolder() . (new Str($image))->removeAllAfterLast('/');
         }
 
         $folderParsers = new FolderParser($imageDirectories);
@@ -77,8 +78,8 @@ class SiteGenerator
                     if ($node instanceof File) {
                         $imageExtractor = $node->getContents()
                             ->then(function ($content) use (&$images, &$processedFileCount) {
-                                $imageExtractor = new ImageExtractor($content);
-                                return $imageExtractor->getImages();
+                                $imageExtractor = new AssetExtractor($content);
+                                return $imageExtractor->getAssets();
                             });
 
                         $extractedImages = await($imageExtractor, $this->loop);
