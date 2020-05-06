@@ -79,12 +79,12 @@ class SiteGenerator
 
         }
 
-        $this->io->section('Creating Folders');
+        $this->io->section('Creating necessary folders for all assets');
         $this->io->listing(array_unique($imageDirectories));
 
         $folderParsers = new FolderParser(array_unique($imageDirectories));
 
-        $this->io->section('Creating necessary folders for all assets');
+
         foreach ($folderParsers->parse() as $folder) {
 
             $createDir = $this->filesystem->dir($folder)->createRecursive();
