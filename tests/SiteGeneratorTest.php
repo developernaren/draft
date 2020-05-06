@@ -74,6 +74,11 @@ class SiteGeneratorTest extends AbstractTestCase
             public function listing(...$arg){
 
             }
+
+            public function warning(...$arg){
+
+            }
+
         };
     }
 }
